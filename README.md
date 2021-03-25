@@ -1,6 +1,8 @@
 # Example Web-App
 
-This repository contains a simple web-app, comprised of the following:
+This repository contains a simple Guestbook web-app, allowing visitors to record their name on entry.
+
+## Components
 
 | Location | Description |
 | --- | --- |
