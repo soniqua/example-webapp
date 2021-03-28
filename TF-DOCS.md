@@ -43,6 +43,5 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_load_balancer_hostname"></a> [load\_balancer\_hostname](#output\_load\_balancer\_hostname) | n/a |
-| <a name="output_load_balancer_info"></a> [load\_balancer\_info](#output\_load\_balancer\_info) | n/a |
-| <a name="output_load_balancer_name"></a> [load\_balancer\_name](#output\_load\_balancer\_name) | n/a |
+| <a name="output_load_balancer_hostname"></a> [load\_balancer\_hostname](#output\_load\_balancer\_hostname) | The URL of the provisioned Load Balancer |
+| <a name="output_load_balancer_name"></a> [load\_balancer\_name](#output\_load\_balancer\_name) | The name of the Load Balancer |

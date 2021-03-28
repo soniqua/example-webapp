@@ -117,12 +117,10 @@ data "aws_elb" "lb" {
 
 output "load_balancer_hostname" {
   value = kubernetes_service.example-webapp.status.0.load_balancer.0.ingress.0.hostname
+  description = "The URL of the provisioned Load Balancer"
 }
 
 output "load_balancer_name" {
   value = local.lb_name
-}
-
-output "load_balancer_info" {
-  value = data.aws_elb.lb
+  description = "The name of the Load Balancer"
 }
