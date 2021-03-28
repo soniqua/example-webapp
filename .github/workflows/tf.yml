@@ -27,3 +27,12 @@ jobs:
       - name: Terraform validate
         id: validate
         run: terraform validate
+
+      - name: Install Checkov
+        run: |
+          python -m pip install --upgrade pip
+          pip install checkov
+
+      - name: Run Checkov
+        id: checkov
+        run: checkov -d terraform
