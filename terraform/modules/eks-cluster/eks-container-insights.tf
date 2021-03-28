@@ -1,6 +1,4 @@
 # Namespace
-# IAM role
-#
 
 resource "kubernetes_namespace" "cloudwatch" {
   metadata {
@@ -13,75 +11,80 @@ resource "kubernetes_namespace" "cloudwatch" {
 
 # Service Account
 
-resource "kubernetes_service_account" "cloudwatch" {
+resource "kubernetes_service_account" "cloudwatch_agent" {
   metadata {
     name      = "cloudwatch-agent"
-    namespace = kubernetes_namespace.cloudwatch.metadata[0].name
+    namespace = "amazon-cloudwatch"
   }
 }
 
 # Cluster Role
 
-resource "kubernetes_role" "cloudwatch" {
+resource "kubernetes_cluster_role" "cloudwatch_agent_role" {
   metadata {
     name = "cloudwatch-agent-role"
   }
 
   rule {
+    verbs      = ["list", "watch"]
     api_groups = [""]
     resources  = ["pods", "nodes", "endpoints"]
-    verbs      = ["list", "watch"]
   }
 
   rule {
+    verbs      = ["list", "watch"]
     api_groups = ["apps"]
     resources  = ["replicasets"]
-    verbs      = ["list", "watch"]
   }
 
   rule {
+    verbs      = ["list", "watch"]
     api_groups = ["batch"]
     resources  = ["jobs"]
-    verbs      = ["list", "watch"]
   }
 
   rule {
+    verbs      = ["get"]
     api_groups = [""]
     resources  = ["nodes/proxy"]
-    verbs      = ["get"]
   }
 
   rule {
+    verbs      = ["create"]
     api_groups = [""]
     resources  = ["nodes/stats", "configmaps", "events"]
-    verbs      = ["create"]
   }
 
   rule {
+    verbs          = ["get", "update"]
     api_groups     = [""]
     resources      = ["configmaps"]
     resource_names = ["cwagent-clusterleader"]
-    verbs          = ["get", "update"]
   }
 }
+
 
 # Bind the role
 
-resource "kubernetes_role_binding" "cloudwatch" {
+resource "kubernetes_cluster_role_binding" "cloudwatch_agent_role_binding" {
   metadata {
     name = "cloudwatch-agent-role-binding"
   }
+
   subject {
     kind      = "ServiceAccount"
-    name      = kubernetes_service_account.cloudwatch.metadata[0].name
-    namespace = kubernetes_namespace.cloudwatch.metadata[0].name
+    name      = "cloudwatch-agent"
+    namespace = "amazon-cloudwatch"
   }
+
   role_ref {
-    kind      = "ClusterRole"
-    name      = kubernetes_role.cloudwatch.metadata[0].name
     api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cloudwatch-agent-role"
   }
 }
+
+# Config Map
 
 resource "kubernetes_config_map" "cloudwatch" {
   metadata {
@@ -89,67 +92,80 @@ resource "kubernetes_config_map" "cloudwatch" {
     namespace = kubernetes_namespace.cloudwatch.metadata[0].name
   }
   data = {
-    "cwagentconfig.json" = file("${path.module}/cwagentconfig.json") #todo - template this
+    "cwagentconfig.json" = file("${path.module}/cwagentconfig.json")
   }
 }
 
-resource "kubernetes_daemonset" "cloudwatch" {
+# Daemonset
+
+resource "kubernetes_daemonset" "cloudwatch_agent" {
   metadata {
     name      = "cloudwatch-agent"
     namespace = "amazon-cloudwatch"
   }
+
   spec {
     selector {
       match_labels = {
         name = "cloudwatch-agent"
       }
     }
+
     template {
       metadata {
         labels = {
           name = "cloudwatch-agent"
         }
       }
+
       spec {
-        service_account_name             = "cloudwatch-agent"
-        termination_grace_period_seconds = 60
         volume {
+          name = kubernetes_config_map.cloudwatch.metadata[0].name
           config_map {
             name = "cwagentconfig"
           }
-          name = "cwagentconfig"
         }
+
         volume {
+          name = "rootfs"
           host_path {
             path = "/"
           }
-          name = "rootfs"
         }
+
         volume {
+          name = "dockersock"
           host_path {
             path = "/var/run/docker.sock"
           }
-          name = "dockersock"
         }
+
         volume {
+          name = "varlibdocker"
           host_path {
             path = "/var/lib/docker"
           }
-          name = "varlibdocker"
         }
+
         volume {
+          name = "sys"
           host_path {
             path = "/sys"
           }
-          name = "sys"
         }
+
         volume {
+          name = "devdisk"
+
           host_path {
             path = "/dev/disk/"
           }
-          name = "devdisk"
         }
+
         container {
+          name  = "cloudwatch-agent"
+          image = "amazon/cloudwatch-agent:1.247347.5b250583"
+
           env {
             name = "HOST_IP"
             value_from {
@@ -158,6 +174,7 @@ resource "kubernetes_daemonset" "cloudwatch" {
               }
             }
           }
+
           env {
             name = "HOST_NAME"
             value_from {
@@ -166,6 +183,7 @@ resource "kubernetes_daemonset" "cloudwatch" {
               }
             }
           }
+
           env {
             name = "K8S_NAMESPACE"
             value_from {
@@ -174,53 +192,62 @@ resource "kubernetes_daemonset" "cloudwatch" {
               }
             }
           }
+
           env {
             name  = "CI_VERSION"
             value = "k8s/1.3.5"
           }
-          image = "amazon/cloudwatch-agent:1.247347.5b250583"
-          name  = "cloudwatch-agent"
+
           resources {
             limits = {
               cpu    = "200m"
               memory = "200Mi"
             }
+
             requests = {
               cpu    = "200m"
               memory = "200Mi"
             }
           }
+
           volume_mount {
+            name       = kubernetes_config_map.cloudwatch.metadata[0].name
             mount_path = "/etc/cwagentconfig"
-            name       = "cwagentconfig"
           }
+
           volume_mount {
-            mount_path = "/rootfs"
             name       = "rootfs"
             read_only  = true
-
+            mount_path = "/rootfs"
           }
+
           volume_mount {
-            mount_path = "/var/run/docker.sock"
             name       = "dockersock"
             read_only  = true
+            mount_path = "/var/run/docker.sock"
           }
+
           volume_mount {
-            mount_path = "/var/lib/docker"
             name       = "varlibdocker"
             read_only  = true
+            mount_path = "/var/lib/docker"
           }
+
           volume_mount {
-            mount_path = "/sys"
             name       = "sys"
             read_only  = true
+            mount_path = "/sys"
           }
+
           volume_mount {
-            mount_path = "/dev/disk"
             name       = "devdisk"
             read_only  = true
+            mount_path = "/dev/disk"
           }
         }
+
+        termination_grace_period_seconds = 60
+        service_account_name             = kubernetes_service_account.cloudwatch_agent.metadata[0].name
       }
     }
   }

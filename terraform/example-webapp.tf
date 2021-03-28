@@ -52,8 +52,8 @@ resource "kubernetes_pod" "example-webapp" {
       }
       resources {
         limits = {
-          cpu    = "1000m"
-          memory = "1024Mi"
+          cpu    = "200m"
+          memory = "128Mi"
         }
       }
       security_context {
@@ -76,8 +76,8 @@ resource "kubernetes_pod" "example-webapp" {
       }
       resources {
         limits = {
-          cpu    = "1000m"
-          memory = "1024Mi"
+          cpu    = "200m"
+          memory = "256Mi"
         }
       }
       security_context {
@@ -99,11 +99,11 @@ resource "kubernetes_service" "example-webapp" {
       app = kubernetes_pod.example-webapp.metadata.0.labels.app
     }
     port {
-      port        = 80
+      port        = 80 #Set to 443 for HTTPS traffic if supported by a certificate or ingress controller
       target_port = 3000
     }
     type                        = "LoadBalancer"
-    load_balancer_source_ranges = local.current_ip
+    load_balancer_source_ranges = local.allowed_access_cidrs
   }
 }
 
@@ -116,11 +116,6 @@ data "aws_elb" "lb" {
 }
 
 output "load_balancer_hostname" {
-  value = kubernetes_service.example-webapp.status.0.load_balancer.0.ingress.0.hostname
+  value       = kubernetes_service.example-webapp.status.0.load_balancer.0.ingress.0.hostname
   description = "The URL of the provisioned Load Balancer"
-}
-
-output "load_balancer_name" {
-  value = local.lb_name
-  description = "The name of the Load Balancer"
 }
