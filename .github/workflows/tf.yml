@@ -35,4 +35,4 @@ jobs:
 
       - name: Run Checkov
         id: checkov
-        run: checkov -d terraform
+        run: python -m checkov --quiet -d terraform
