@@ -37,8 +37,3 @@ output "cluster_ca_cert" {
   description = "CA Cert for K8S"
   value       = module.eks.cluster_certificate_authority_data #this is base64 encoded.
 }
-
-output "ecr_repo_url" {
-  description = "The URL of the created ECR repository"
-  value       = aws_ecr_repository.k8s.repository_url
-}
