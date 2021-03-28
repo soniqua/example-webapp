@@ -42,3 +42,8 @@ variable "profile" {
 variable "region" {
   description = "The region of the ECR repository to push to"
 }
+
+output "image_name" {
+  description = "The image name (including tag)"
+  value = "${aws_ecr_repository.repo.repository_url}:${var.tag}"
+}
