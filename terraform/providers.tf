@@ -18,7 +18,7 @@ provider "kubernetes" {
       "get-token",
       "--cluster-name",
       data.aws_eks_cluster.cluster.name,
-      "--role-arn", # Need to add this if using STS to access cluster
+      "--role-arn",   # Need to add this if using STS to access cluster
       local.role_arn, # May be ommitted if STS is not used.
       "--profile",
       local.profile

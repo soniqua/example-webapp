@@ -40,5 +40,5 @@ output "cluster_ca_cert" {
 
 output "ecr_repo_url" {
   description = "The URL of the created ECR repository"
-  value = aws_ecr_repository.k8s.repository_url
+  value       = aws_ecr_repository.k8s.repository_url
 }

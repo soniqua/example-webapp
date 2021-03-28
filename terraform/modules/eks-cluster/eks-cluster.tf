@@ -9,8 +9,8 @@ module "eks" {
   }
 
   #set access
-  cluster_endpoint_public_access =true
-  cluster_endpoint_private_access =true
+  cluster_endpoint_public_access       = true
+  cluster_endpoint_private_access      = true
   cluster_endpoint_public_access_cidrs = concat(var.api_access_CIDR_range, [for ip in module.vpc.nat_public_ips : "${ip}/32"])
 
   vpc_id = module.vpc.vpc_id
@@ -32,6 +32,6 @@ module "eks" {
 }
 
 variable "api_access_CIDR_range" {
-  type = list(string)
+  type        = list(string)
   description = "CIDR range(s) to be whitelisted for the K8S API endpoint"
 }

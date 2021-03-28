@@ -1,12 +1,12 @@
 # Create a new ECR registry and build a new image from an associated Dockerfile
 
 module "build-example-webapp" {
-  source = "./modules/ecr-image"
+  source       = "./modules/ecr-image"
   build_folder = "../webapp"
-  app_name = "example-webapp"
-  tag = "0.0.1"
-  region = local.region
-  profile = "cr-lab-mr"
+  app_name     = "example-webapp"
+  tag          = "0.0.1"
+  region       = local.region
+  profile      = "cr-lab-mr"
 }
 
 # Create a new Kubernetes Pod
@@ -20,7 +20,7 @@ resource "kubernetes_pod" "example-webapp" {
   }
   spec {
     container {
-      name = "webapp"
+      name  = "webapp"
       image = module.build-example-webapp.image_name
       port {
         container_port = 3000
@@ -31,16 +31,16 @@ resource "kubernetes_pod" "example-webapp" {
           port = 3000
 
           http_header {
-            name = "X-Kubernetes-Liveness-Probe"
+            name  = "X-Kubernetes-Liveness-Probe"
             value = "OK"
           }
         }
         initial_delay_seconds = 5
-        period_seconds = 5
+        period_seconds        = 5
       }
     }
     container {
-      name = "redis"
+      name  = "redis"
       image = "redis"
       port {
         container_port = 6379
@@ -50,7 +50,7 @@ resource "kubernetes_pod" "example-webapp" {
           command = ["redis-cli", "ping"] #Add liveness_probe to ensure redis is ready
         }
         initial_delay_seconds = 5
-        period_seconds = 5
+        period_seconds        = 5
       }
     }
   }
@@ -67,10 +67,10 @@ resource "kubernetes_service" "example-webapp" {
       app = kubernetes_pod.example-webapp.metadata.0.labels.app
     }
     port {
-      port = 80
+      port        = 80
       target_port = 3000
     }
-    type = "LoadBalancer"
+    type                        = "LoadBalancer"
     load_balancer_source_ranges = local.current_ip
   }
 }
