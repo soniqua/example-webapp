@@ -13,4 +13,5 @@ resource "aws_security_group" "eks_worker" {
       "192.168.0.0/16",
     ]
   }
+  description = "Security Group for EKS Worker Nodes"
 }

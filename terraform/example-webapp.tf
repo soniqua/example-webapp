@@ -9,6 +9,17 @@ module "build-example-webapp" {
   profile      = "cr-lab-mr"
 }
 
+# Create a new Kubernetes Namespace
+
+resource "kubernetes_namespace" "example-webapp" {
+  metadata {
+    labels = {
+      name = "example-webapp"
+    }
+    name = "example-webapp-namespace"
+  }
+}
+
 # Create a new Kubernetes Pod
 
 resource "kubernetes_pod" "example-webapp" {
@@ -16,7 +27,8 @@ resource "kubernetes_pod" "example-webapp" {
     labels = {
       app = "example-webapp"
     }
-    name = "example-webapp"
+    name      = "example-webapp"
+    namespace = kubernetes_namespace.example-webapp.metadata[0].name
   }
   spec {
     container {
@@ -38,10 +50,20 @@ resource "kubernetes_pod" "example-webapp" {
         initial_delay_seconds = 5
         period_seconds        = 5
       }
+      resources {
+        limits = {
+          cpu    = "1000m"
+          memory = "1024Mi"
+        }
+      }
+      security_context {
+        allow_privilege_escalation = false
+        read_only_root_filesystem  = true
+      }
     }
     container {
       name  = "redis"
-      image = "redis"
+      image = "redis:6.2.1"
       port {
         container_port = 6379
       }
@@ -52,6 +74,15 @@ resource "kubernetes_pod" "example-webapp" {
         initial_delay_seconds = 5
         period_seconds        = 5
       }
+      resources {
+        limits = {
+          cpu    = "1000m"
+          memory = "1024Mi"
+        }
+      }
+      security_context {
+        allow_privilege_escalation = false
+      }
     }
   }
 }
@@ -60,7 +91,8 @@ resource "kubernetes_pod" "example-webapp" {
 
 resource "kubernetes_service" "example-webapp" {
   metadata {
-    name = "example-webapp-svc"
+    name      = "example-webapp-svc"
+    namespace = kubernetes_namespace.example-webapp.metadata[0].name
   }
   spec {
     selector = {
