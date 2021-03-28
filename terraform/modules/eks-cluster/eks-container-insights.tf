@@ -92,7 +92,12 @@ resource "kubernetes_config_map" "cloudwatch" {
     namespace = kubernetes_namespace.cloudwatch.metadata[0].name
   }
   data = {
-    "cwagentconfig.json" = file("${path.module}/cwagentconfig.json")
+    "cwagentconfig.json" = templatefile(
+      "${path.module}/cwagentconfig.json",
+      {
+        region = var.region
+      }
+    )
   }
 }
 
