@@ -3,3 +3,5 @@ logs
 
 #Remove terraform cache
 .terraform
+*.lock.*
+*.backup
