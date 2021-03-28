@@ -50,7 +50,9 @@ The following Alternatives were considered for this repository:
 | A combination of AWS CloudFormation and configuration management (Ansible, Chef) | Requires additional infrastructure to support configuration management tools, procedurally generated configuration which may be prone to drift, changes require an awareness of already-present infrastructure |
 
 | Alternative Logging/Monitoring/Alerting Methods | Reasons why not used |
-| Prometheus/Grafana | Requires additional infrastructure and adds complexity. Not suited for a deployment of this size |
+| --- | --- |
+| Prometheus/Grafana | Requires additional infrastructure and adds complexity. Not suited for a deployment of this size. Note that AWS now support an EKS exporter for [Prometheus](https://docs.amazonaws.cn/en_us/AmazonCloudWatch/latest/monitoring/ContainerInsights-Prometheus.html).|
+| Kubernetes Metrics Server | Not suitable for alerting - primary functions are for Autoscaling |
 
 ## Deployment Plan
 
@@ -164,6 +166,7 @@ Ideally this repository would be deployed upon a pull request to `main` - the Gi
 ### Kubernetes Documentation
 - [kubernetes pod spec](https://kubernetes.io/docs/concepts/workloads/pods/)
 - [kubernetes service spec](https://kubernetes.io/docs/concepts/services-networking/service/)
+- [kubernetes monitoring](https://kubernetes.io/docs/tasks/debug-application-cluster/resource-usage-monitoring/)
 
 ### Terraform Documentation
 - [kubernetes provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs)
@@ -179,4 +182,4 @@ Ideally this repository would be deployed upon a pull request to `main` - the Gi
 
 ### Additional Software
 - [k2tf](https://github.com/sl1pm4t/k2tf) - convert Kubernetes YAML files to Terraform
-- [minikube](https://minikube.sigs.k8s.io/docs/start/) - for local debugging
+- [minikube](https://minikube.sigs.k8s.io/docs/start/) - for local K8S testing
