@@ -8,9 +8,6 @@ on:
 jobs:
   tf_checks:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: terraform
 
     steps:
       - uses: actions/checkout@v2
@@ -19,14 +16,17 @@ jobs:
       - name: Terraform fmt
         id: fmt
         run:  terraform fmt -diff -recursive
+        working-directory: terraform
 
       - name: Terraform init
         id: init
         run: terraform init -backend=false
+        working-directory: terraform
 
       - name: Terraform validate
         id: validate
         run: terraform validate
+        working-directory: terraform
 
       - name: Install Checkov
         run: |
@@ -35,4 +35,4 @@ jobs:
 
       - name: Run Checkov
         id: checkov
-        run: python -m checkov --quiet -d terraform
+        run: checkov --quiet -d terraform
