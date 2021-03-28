@@ -101,6 +101,8 @@ The Amazon Cloudwatch agent is deployed as a Kubernetes `daemonset` on the EKS c
 |`pod_cpu_utilization_over_pod_limit` | If this is high for an extended period of time it may indicate a reduced responsiveness for the application |
 |`pod_memory_utilization_over_pod_limit` | If this is high for an extended period of time it may indicate a memory leak or excessive load |
 
+Logs may be viewed at Cloudwatch under the `/aws/containerinsights` namespace.
+
 ### Other Metrics
 
 | Metric | Description |
@@ -155,6 +157,7 @@ Ideally this repository would be deployed upon a pull request to `main` - the Gi
 - Migrate `redis` to ElasticCache/a separate shared pod
 - Perform docker container build off-machine via CI/CD pipeline
 - Automatic deployments from `main`
+- Enforce stricter security groups within VPC for EKS workers
 
 ## Resources/references
 
@@ -172,6 +175,7 @@ Ideally this repository would be deployed upon a pull request to `main` - the Gi
 
 ### EKS Requirements/Security Considerations
 - [EKS Cloudwatch Metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-metrics-EKS.html)
+- [EKS Security](https://docs.aws.amazon.com/eks/latest/userguide/security.html)
 
 ### Additional Software
 - [k2tf](https://github.com/sl1pm4t/k2tf) - convert Kubernetes YAML files to Terraform
