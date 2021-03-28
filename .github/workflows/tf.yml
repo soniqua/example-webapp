@@ -1,0 +1,37 @@
+# This workflow ensures Terraform is built to-spec, and has no formatting erorrs.
+
+name: Terraform
+
+on:
+  push
+
+jobs:
+  tf_checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform fmt
+        id: fmt
+        run:  terraform fmt -diff -recursive
+        working-directory: terraform
+
+      - name: Terraform init
+        id: init
+        run: terraform init -backend=false
+        working-directory: terraform
+
+      - name: Terraform validate
+        id: validate
+        run: terraform validate
+        working-directory: terraform
+
+      - name: Run Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: terraform/
+          quiet: true
+          framework: terraform
