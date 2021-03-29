@@ -59,7 +59,7 @@ The following Alternatives were considered for this repository:
 ### Running the web-app locally via Docker-Compose
 
 1. Clone this repository.
-1. Run `docker-compose up -d` in the same directory as the `docker-compose.yml` file.
+1. Run `docker-compose up -d` in the root directory (alongside the `docker-compose.yml` file).
 1. The webapp will be available on `localhost:80`.
 1. Run `docker-compose down` when finished.
 
