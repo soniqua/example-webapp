@@ -6,9 +6,10 @@ services:
       context: ./webapp
       dockerfile: Dockerfile
     image: webapp:latest
+    network_mode: host
     ports:
       - "3000:3000"
   redis:
     image: redis:latest
-    expose:
-      - "6379"
+    ports:
+      - "6379:6379"
