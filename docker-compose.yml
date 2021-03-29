@@ -1,0 +1,12 @@
+services:
+  webapp:
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
+    image: webapp:latest
+    ports:
+      - "3000:3000"
+  redis:
+    image: redis:latest
+    expose:
+      - "6379"
