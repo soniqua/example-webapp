@@ -2,7 +2,7 @@
 
 locals {
   region               = "eu-west-2"
-  use_sts              = true
+  use_sts              = false
   use_credentials_file = true
   role_arn             = "arn:aws:iam::772290144575:role/Admin"
   profile              = "cr-lab"

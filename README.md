@@ -41,11 +41,11 @@ The following Alternatives were considered for this repository:
 | --- | --- |
 | On-machine deployment | Whilst this is the simplest deployment method (achieved by `docker-compose` or a `minikube` cluster) it is not readily scalable, secured or accessible outside of a local network. |
 | Bare Metal deployment | This method requires a new host OS to be restarted every time a change is made to the application, and is not immutable (changes may be made to application code by hand and cause drift). Describable as code, but not as robust as using a managed service (the owners are responsible for operating system updates as well as the running application) |
-| Serverless deployment | The application is not suited for a serverless deployment method as it requires a connction to a Redis database on `localhost`.
+| Serverless deployment | The application is not suited for a serverless deployment method as it requires a connection to a Redis database on `localhost`.
 
 | Alternative Deployment Methods | Reasons why not used |
 | --- | --- |
-| AWS CLI | Erorr-prone, any scripting or encapsulation of the CLI may require updates when AWS APIs/CLI are uodated. AWS only. |
+| AWS CLI | Error-prone, any scripting or encapsulation of the CLI may require updates when AWS APIs/CLI are updated. AWS only. |
 | AWS CloudFormation | Not DRY (creating reusable loops or modules is challenging or requires a Lambda function to transform data), closed source and AWS only. Requires the use of `user-data` to procedurally define on-host configuration, which may fail if the Host OS changes. |
 | A combination of AWS CloudFormation and configuration management (Ansible, Chef) | Requires additional infrastructure to support configuration management tools, procedurally generated configuration which may be prone to drift, changes require an awareness of already-present infrastructure |
 
@@ -65,11 +65,15 @@ The following Alternatives were considered for this repository:
 
 ### Deploying to AWS via Terraform
 **Currently no remote state is used.**
+
+Ensure [configuration is appropriately](#configuration) set in `main.tf` before continuing
+
 1. Clone this repository.
 1. Ensure your AWS credentials are valid and have the appropriate permissions to deploy requested infrastructure.
-1. Execute `terraform init && terraform plan` in the `/terraform` directory.
-1. Execute `terraform apply` to start the deployment.
-1. Once created, review the output from the `terraform apply` run and access the web-app on the provided url:
+1. Execute the `deploy.sh` shell script. This performs the following actions:
+  1. Execute `terraform init && terraform plan` in the `/terraform` directory.
+  1. Execute `terraform apply` to start the deployment.
+  1. Once created, review the output from the `terraform apply` run and access the web-app on the provided url:
 
 ```
 Outputs:
@@ -79,7 +83,6 @@ load_balancer_hostname = "{{alb_id}}.{{region}}.elb.amazonaws.com"
 ```
 
 6. Run `terraform destroy` when finished.
-
 
 ## Monitoring, Reporting and Alerting
 
@@ -121,7 +124,7 @@ Within the `main.tf` file:
   - set `local.use_sts` to `true`
 - Set `local.profile` to the AWS profile
 - Set `local.region` to the AWS region to deploy to
-- Set `local.use_credentials_file` to `true` if using credentials contained within `~/.aws/credentials`
+- Set `local.use_credentials_file` to `true` if using credentials contained within `~/.aws/credentials` - otherwise Terraform will default to environment variables.
 
 Set the `instance_type` and `instance_count` variables to specify the size and worker count of the AWS EKS cluster.
 
